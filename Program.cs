@@ -47,8 +47,27 @@ namespace CsharpPy
 
             Console.WriteLine($"Is Initlized {pyApi.IsInitlized}");
 
-            var importSample = PythonAPI.PyObject.Import("sample");
+            var Qt5 = PythonAPI.PyObject.Import("PyQt5.QtWidgets");
+            {
+                var QApplication = Qt5.GetAttr("QApplication");
+                {
+                    var SetLibraryPath = QApplication.GetAttr("addLibraryPath");
+                    var setArgs = PythonAPI.PyObject.Tuple(1);
+                    setArgs.TupleSetItem(0, PythonAPI.PyObject.FromString(anaconda_home));
 
+                    SetLibraryPath.Call(setArgs);
+                }
+                {
+                    var SetLibraryPath = QApplication.GetAttr("addLibraryPath");
+                    var setArgs = PythonAPI.PyObject.Tuple(1);
+                    setArgs.TupleSetItem(0, PythonAPI.PyObject.FromString(anaconda_home + "\\Library\\plugins"));
+
+                    SetLibraryPath.Call(setArgs);
+                }
+            }
+
+            //実行したいスクリプト
+            var importSample = PythonAPI.PyObject.Import("sample");
             {
                 //引数なし、戻り値なしの関数呼び出し。
                 var func = importSample.GetAttr("func");
@@ -70,7 +89,6 @@ namespace CsharpPy
                 var instance = typeClass.Call(initArgs);
 
             }
-
             {
                 //継承したクラスの生成
                 var typeClass = importSample.GetAttr("SampleClass2");
