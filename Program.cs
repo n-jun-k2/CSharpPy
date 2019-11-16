@@ -96,6 +96,12 @@ namespace CsharpPy
                 var instance = typeClass.Call(initArgs);
             }
 
+            var importMLP = PythonAPI.PyObject.Import("mlp");
+            {
+                var ministFunc = importMLP.GetAttr("ministFunc");
+                var pyFuncArgs = PythonAPI.PyObject.Tuple(0);
+                ministFunc.Call(pyFuncArgs);
+            }
         }
     }
 }

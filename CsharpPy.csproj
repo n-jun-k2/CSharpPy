@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="mlp.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="sample.py">
       <Generator>MSDataSetGenerator</Generator>
       <LastGenOutput>sample.Designer.cs</LastGenOutput>
