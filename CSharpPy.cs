@@ -80,7 +80,13 @@ namespace CsharpPy
                 for(int i = 0; i < size; i++)
                 {
                     var item = getItem(_dir,i);
+#if UNITY_EDITOR
+                    var ptr = toUTF8(item);
+                    var len = Unmanaged.Ptr.PtrLength(ptr);
+                    dirs.Add(Unmanaged.Ptr.ToStringUTF8(ptr,len));
+#else
                     dirs.Add(Marshal.PtrToStringUTF8(toUTF8(item)));
+#endif
                 }
                 return dirs;
             }
@@ -100,9 +106,18 @@ namespace CsharpPy
 
             public static implicit operator long(PyObject obj)=>instance.Dll.GetFunc<PyLong_AsLong>()(obj.handle);
             public static implicit operator double(PyObject obj)=>instance.Dll.GetFunc<PyFloat_AsDouble>()(obj.handle);
-            public static implicit operator string(PyObject obj)=>Marshal.PtrToStringUTF8(instance.Dll.GetFunc<PyUnicode_AsUTF8>()(obj.handle));
+            public static implicit operator string(PyObject obj)
+            {
+#if UNITY_EDITOR
+                var ptr = instance.Dll.GetFunc<PyUnicode_AsUTF8>()(obj.handle);
+                var len = Unmanaged.Ptr.PtrLength(ptr);
+                return Unmanaged.Ptr.ToStringUTF8(ptr, len);
+#else
+                return Marshal.PtrToStringUTF8(instance.Dll.GetFunc<PyUnicode_AsUTF8>()(obj.handle));
+#endif
+            }
 
-            #region IDisposable Support
+#region IDisposable Support
             private bool disposedValue = false; // 重複する呼び出しを検出するには
 
             void Dispose(bool disposing)
@@ -137,7 +152,7 @@ namespace CsharpPy
                 // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
                 // GC.SuppressFinalize(this);
             }
-            #endregion
+#endregion
 
         }
 
@@ -147,7 +162,7 @@ namespace CsharpPy
 
             public GIL() => handle = instance.Dll.GetFunc<PyGILState_Ensure>()();
 
-            #region IDisposable Support
+#region IDisposable Support
             private bool disposedValue = false; // 重複する呼び出しを検出するには
 
             void Dispose(bool disposing)
@@ -182,7 +197,7 @@ namespace CsharpPy
                 // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
                 // GC.SuppressFinalize(this);
             }
-            #endregion
+#endregion
 
         }
 
@@ -225,7 +240,7 @@ namespace CsharpPy
         delegate long PyLong_AsLong(IntPtr item);
         delegate double PyFloat_AsDouble(IntPtr item);
 
-        #region IDisposable Support
+#region IDisposable Support
         private bool disposedValue = false; // 重複する呼び出しを検出するには
 
         void Dispose(bool disposing)
@@ -259,7 +274,7 @@ namespace CsharpPy
             // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
             // GC.SuppressFinalize(this);
         }
-        #endregion
+#endregion
 
     }
 }
